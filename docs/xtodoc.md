@@ -1,5 +1,5 @@
-#! /usr/bin/env ruby
-=begin
+```rb#! /usr/bin/env ruby
+```
   # About
   xtodoc takes in commented files and outputs them in markdown. Markdown formatting used
   within the code is respected.
@@ -14,13 +14,12 @@
 
   # License
   This code is licensed under AGPL.
-=end
+```rb
 require 'pathname'
 require 'fileutils'
 def top_parent_dir(path)
   Pathname.new(path).each_filename.to_a[0]
 end
-
 def mdfile(file, output_dir)
   file_extension = File.extname(file).delete('.')
   file_name = file[0..file.length - (file_extension.length + 2)]
@@ -75,3 +74,4 @@ end
 for file in resource_paths
   mdfile(file, OUTPUT_DIR)
 end
+```
