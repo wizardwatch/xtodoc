@@ -20,23 +20,13 @@ require 'fileutils'
 def top_parent_dir(path)
   Pathname.new(path).each_filename.to_a[0]
 end
-def mdfile(file, output_dir)
-  file_extension = File.extname(file).delete('.')
-  file_name = file[0..file.length - (file_extension.length + 2)]
-  output_file = File.new("#{output_dir}/#{file_name}.md", 'w')
+
+def nix(file, output_file, file_extension)
   output_file.write("```#{file_extension}")
-  case file_extension
-  when 'nix'
-    openers = ['/*']
-    closers = ['*/']
-  when 'rb'
-    openers = ['=begin']
-    closers = ['=end']
-  end
   File.open(file).each_line do |line|
-    if openers.any? { |x| line.chomp.start_with? x }
+    if line.chomp.start_with? '/*'
       output_file.puts('```')
-    elsif closers.any? { |x| line.chomp.start_with? x }
+    elsif line.chomp.start_with? '*/'
       output_file.puts("```#{file_extension}")
     else
       output_file.write(line)
@@ -45,28 +35,49 @@ def mdfile(file, output_dir)
   output_file.puts('```')
 end
 
-# input = ARGV
-# kcase input.first
-# when 'md'
-#   mdfile(input[1])
-# end
+def rb(file, output_file, file_extension)
+  output_file.write("```#{file_extension}")
+  File.open(file).each_line do |line|
+    if line.chomp.start_with? '=begin'
+      output_file.puts('```')
+    elsif line.chomp.start_with? '=end'
+      output_file.puts("```#{file_extension}")
+    else
+      output_file.write(line)
+    end
+  end
+  output_file.puts('```')
+end
+
+def other(file, output_file)
+  File.open(file).each_line do |line|
+    output_file.write(line)
+  end
+end
+
+def mdfile(file, output_dir)
+  case File.extname(file).delete('.')
+  when 'nix'
+    nix(file, File.new("#{output_dir}/#{file}.md", 'w'), 'nix')
+  when 'rb'
+    rb(file, File.new("#{output_dir}/#{file}.md", 'w'), 'rb')
+  when 'md'
+    other(file, File.new("#{output_dir}/#{file}", 'w'))
+  else
+    other(file, File.new("#{output_dir}/#{file}.md", 'w'))
+  end
+end
 
 OUTPUT_DIR = 'docs'
 resource_paths = Dir.glob('**/*').reject do |path|
   top_parent_dir(path) == OUTPUT_DIR || File.directory?(path)
 end
-print resource_paths
-puts
-
 if Pathname.new(OUTPUT_DIR).exist?
   FileUtils.remove_dir OUTPUT_DIR
 end
 directories = Dir.glob('**/*').select do |path|
-  puts File.file?(path)
   File.directory?(path) and path != OUTPUT_DIR
 end
-print directories
-puts
 FileUtils.mkpath OUTPUT_DIR
 for dir in directories
   FileUtils.mkpath "#{OUTPUT_DIR}/#{dir}"
