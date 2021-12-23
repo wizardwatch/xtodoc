@@ -13,7 +13,7 @@
   anyone else to depend on it for editing any code.
 
   # License
-  This code is licensed under AGPL.
+  This code is licensed under GPLv3.
 ```rb
 require 'pathname'
 require 'fileutils'
