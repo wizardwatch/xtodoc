@@ -24,9 +24,9 @@ end
 def nix(file, output_file, file_extension)
   output_file.write("```#{file_extension}")
   File.open(file).each_line do |line|
-    if line.chomp.start_with? '/*'
+    if line.chomp.lstrip.start_with? '/*'
       output_file.puts('```')
-    elsif line.chomp.start_with? '*/'
+    elsif line.chomp.lstrip.start_with? '*/'
       output_file.puts("```#{file_extension}")
     else
       output_file.write(line)
