@@ -13,7 +13,7 @@ flakes feature.
   using one to target the current system architecture. Again, this is unnecessary for a
   simple script but it is nice to keep it standard.
   */
-  inputs = { 
+  inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
