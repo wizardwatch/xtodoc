@@ -1,4 +1,8 @@
-```nix```
+---
+flake.nix
+---
+```nix
+```
 # Example post
 This is markdown content
 ```nix

@@ -1,4 +1,8 @@
-```nix```
+---
+flake.nix
+---
+```nix
+```
 # About
 This file contains Nix code used to allow the installation of xtodoc via the experimental
 flakes feature.
@@ -13,7 +17,7 @@ flakes feature.
   using one to target the current system architecture. Again, this is unnecessary for a
   simple script but it is nice to keep it standard.
 ```nix
-  inputs = { 
+  inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
@@ -24,7 +28,7 @@ flakes feature.
     };
     xtodoc = (with pkgs; stdenv.mkDerivation {
       pname = "xtodoc";
-      version = "0.0.1";
+      version = "0.0.2";
       src = ./.;
 ```
       During the installPhase I move the ruby file to the appropriate location for it to

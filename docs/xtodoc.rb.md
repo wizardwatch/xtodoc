@@ -1,4 +1,8 @@
-```rb#! /usr/bin/env ruby
+---
+xtodoc.rb
+---
+```rb
+#! /usr/bin/env ruby
 ```
   # About
   xtodoc takes in commented files and outputs them in markdown. Markdown formatting used
@@ -17,12 +21,20 @@
 ```rb
 require 'pathname'
 require 'fileutils'
+
 def top_parent_dir(path)
   Pathname.new(path).each_filename.to_a[0]
 end
 
+def begin_file(file, output_file, file_extension)
+  output_file.puts('---')
+  output_file.puts(File.basename(file))
+  output_file.puts('---')
+  output_file.puts("```#{file_extension}")
+end
+
 def nix(file, output_file, file_extension)
-  output_file.write("```#{file_extension}")
+  begin_file(file, output_file, file_extension)
   File.open(file).each_line do |line|
     if line.chomp.lstrip.start_with? '/*'
       output_file.puts('```')
@@ -36,7 +48,7 @@ def nix(file, output_file, file_extension)
 end
 
 def rb(file, output_file, file_extension)
-  output_file.write("```#{file_extension}")
+  begin_file(file, output_file, file_extension)
   File.open(file).each_line do |line|
     if line.chomp.start_with? '=begin'
       output_file.puts('```')
@@ -50,9 +62,11 @@ def rb(file, output_file, file_extension)
 end
 
 def other(file, output_file)
+  begin_file(file, output_file, '')
   File.open(file).each_line do |line|
     output_file.write(line)
   end
+  output_file.puts('```')
 end
 
 def mdfile(file, output_dir)

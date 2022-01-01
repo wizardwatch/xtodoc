@@ -24,7 +24,7 @@ flakes feature.
     };
     xtodoc = (with pkgs; stdenv.mkDerivation {
       pname = "xtodoc";
-      version = "0.0.1";
+      version = "0.0.2";
       src = ./.;
       /*
       During the installPhase I move the ruby file to the appropriate location for it to
