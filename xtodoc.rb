@@ -22,15 +22,15 @@ def top_parent_dir(path)
   Pathname.new(path).each_filename.to_a[0]
 end
 
-def begin_file(file, output_file, file_extension)
+def begin_file(file, output_file)
   output_file.puts('---')
-  output_file.puts(File.basename(file))
+  output_file.puts("title: #{File.basename(file)}")
   output_file.puts('---')
-  output_file.puts("```#{file_extension}")
 end
 
 def nix(file, output_file, file_extension)
-  begin_file(file, output_file, file_extension)
+  begin_file(file, output_file)
+  output_file.puts("```#{file_extension}")
   File.open(file).each_line do |line|
     if line.chomp.lstrip.start_with? '/*'
       output_file.puts('```')
@@ -44,7 +44,8 @@ def nix(file, output_file, file_extension)
 end
 
 def rb(file, output_file, file_extension)
-  begin_file(file, output_file, file_extension)
+  begin_file(file, output_file)
+  output_file.puts("```#{file_extension}")
   File.open(file).each_line do |line|
     if line.chomp.start_with? '=begin'
       output_file.puts('```')
@@ -58,7 +59,8 @@ def rb(file, output_file, file_extension)
 end
 
 def other(file, output_file)
-  begin_file(file, output_file, '')
+  begin_file(file, output_file)
+  output_file.puts('```')
   File.open(file).each_line do |line|
     output_file.write(line)
   end
@@ -91,6 +93,8 @@ end
 FileUtils.mkpath OUTPUT_DIR
 for dir in directories
   FileUtils.mkpath "#{OUTPUT_DIR}/#{dir}"
+  index = File.new("#{OUTPUT_DIR}/#{dir}/_index.md", 'w')
+  begin_file(dir, index)
 end
 for file in resource_paths
   mdfile(file, OUTPUT_DIR)
