@@ -1,5 +1,5 @@
 ---
-flake.nix
+title: flake.nix
 ---
 ```nix
 ```

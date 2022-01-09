@@ -1,5 +1,5 @@
 ---
-xtodoc.rb
+title: xtodoc.rb
 ---
 ```rb
 #! /usr/bin/env ruby
@@ -26,15 +26,15 @@ def top_parent_dir(path)
   Pathname.new(path).each_filename.to_a[0]
 end
 
-def begin_file(file, output_file, file_extension)
+def begin_file(file, output_file)
   output_file.puts('---')
-  output_file.puts(File.basename(file))
+  output_file.puts("title: #{File.basename(file)}")
   output_file.puts('---')
-  output_file.puts("```#{file_extension}")
 end
 
 def nix(file, output_file, file_extension)
-  begin_file(file, output_file, file_extension)
+  begin_file(file, output_file)
+  output_file.puts("```#{file_extension}")
   File.open(file).each_line do |line|
     if line.chomp.lstrip.start_with? '/*'
       output_file.puts('```')
@@ -48,7 +48,8 @@ def nix(file, output_file, file_extension)
 end
 
 def rb(file, output_file, file_extension)
-  begin_file(file, output_file, file_extension)
+  begin_file(file, output_file)
+  output_file.puts("```#{file_extension}")
   File.open(file).each_line do |line|
     if line.chomp.start_with? '=begin'
       output_file.puts('```')
@@ -61,8 +62,16 @@ def rb(file, output_file, file_extension)
   output_file.puts('```')
 end
 
+def md(file, output_file)
+  begin_file(file, output_file)
+  File.open(file).each_line do |line|
+    output_file.write(line)
+  end
+end
+
 def other(file, output_file)
-  begin_file(file, output_file, '')
+  begin_file(file, output_file)
+  output_file.puts('```')
   File.open(file).each_line do |line|
     output_file.write(line)
   end
@@ -76,7 +85,7 @@ def mdfile(file, output_dir)
   when 'rb'
     rb(file, File.new("#{output_dir}/#{file}.md", 'w'), 'rb')
   when 'md'
-    other(file, File.new("#{output_dir}/#{file}", 'w'))
+    md(file, File.new("#{output_dir}/#{file}", 'w'))
   else
     other(file, File.new("#{output_dir}/#{file}.md", 'w'))
   end
@@ -95,6 +104,8 @@ end
 FileUtils.mkpath OUTPUT_DIR
 for dir in directories
   FileUtils.mkpath "#{OUTPUT_DIR}/#{dir}"
+  index = File.new("#{OUTPUT_DIR}/#{dir}/_index.md", 'w')
+  begin_file(dir, index)
 end
 for file in resource_paths
   mdfile(file, OUTPUT_DIR)

@@ -1,5 +1,5 @@
 ---
-flake.lock
+title: flake.lock
 ---
 ```
 {

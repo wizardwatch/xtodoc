@@ -58,6 +58,13 @@ def rb(file, output_file, file_extension)
   output_file.puts('```')
 end
 
+def md(file, output_file)
+  begin_file(file, output_file)
+  File.open(file).each_line do |line|
+    output_file.write(line)
+  end
+end
+
 def other(file, output_file)
   begin_file(file, output_file)
   output_file.puts('```')
@@ -74,7 +81,7 @@ def mdfile(file, output_dir)
   when 'rb'
     rb(file, File.new("#{output_dir}/#{file}.md", 'w'), 'rb')
   when 'md'
-    other(file, File.new("#{output_dir}/#{file}", 'w'))
+    md(file, File.new("#{output_dir}/#{file}", 'w'))
   else
     other(file, File.new("#{output_dir}/#{file}.md", 'w'))
   end

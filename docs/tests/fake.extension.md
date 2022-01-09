@@ -1,5 +1,5 @@
 ---
-fake.extension
+title: fake.extension
 ---
 ```
 cool man cool
