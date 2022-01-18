@@ -1,0 +1,9 @@
+@import url("./dracula/dracula.css");
+body {
+	width: 50%;
+	margin-inline:  auto;
+}
+.sourceCode {
+	border-radius: 10px;
+	padding: 3px;
+}

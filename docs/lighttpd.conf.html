@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>lighttpd.conf</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dimage%3A%20none%20%21important%3B%0Abackground%2Dcolor%3A%20rgba%2840%2C%2042%2C%2054%2C%201%29%20%21important%3B%0A%7D%0Abody%20%2A%20%7B%0Acolor%3A%20rgba%28248%2C%20248%2C%20242%2C%201%29%3B%0A%7D%0Aa%2C%0Aa%20%2A%20%7B%0Acolor%3A%20rgba%2880%2C%20250%2C%20123%2C%201%29%20%21important%3B%0Abackground%2Dcolor%3A%20transparent%20%21important%3B%0A%7D%0Aa%3Ahover%2C%0Aa%3Ahover%20%2A%2C%0Aa%3Avisited%3Ahover%2C%0Aa%3Avisited%3Ahover%20%2A%2C%0Aspan%5Bonclick%5D%3Ahover%2C%0Adiv%5Bonclick%5D%3Ahover%2C%0A%5Brole%3D%22link%22%5D%3Ahover%2C%0A%5Brole%3D%22link%22%5D%3Ahover%20%2A%2C%0A%5Brole%3D%22button%22%5D%3Ahover%20%2A%2C%0A%5Brole%3D%22menuitem%22%5D%3Ahover%2C%0A%5Brole%3D%22menuitem%22%5D%3Ahover%20%2A%2C%0A%2Elink%3Ahover%2C%0A%2Elink%3Ahover%20%2A%20%7B%0Acolor%3A%20rgba%28241%2C%20250%2C%20140%2C%201%29%20%21important%3B%0A%7D%0Aa%3Avisited%2C%0Aa%3Avisited%20%2A%20%7B%0Acolor%3A%20rgba%2898%2C%20114%2C%20164%2C%201%29%20%21important%3B%0A%7D%0Ah1%2C%0Ah2%2C%0Ah3%2C%0Ah4%2C%0Ah5%2C%0Ah6%2C%0Astrong%2C%0A%5Bid%2A%3D%22headline%22%5D%2C%0A%5Bclass%2A%3D%22headline%22%5D%2C%0A%5Bid%2A%3D%22header%22%5D%2C%0A%5Bclass%2A%3D%22header%22%5D%2C%0A%5Bclass%2A%3D%22header%22%5D%20td%20%7B%0Acolor%3A%20rgba%28255%2C%20184%2C%20108%2C%201%29%20%21important%3B%0A%7D%0Atable%20%7B%0Abackground%2Dcolor%3A%20rgba%2840%2C%2042%2C%2054%2C%201%29%20%21important%3B%0A%7D%0A%5Bid%2A%3D%22overlay%22%5D%2C%0A%5Bid%2A%3D%22lightbox%22%5D%2C%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20rgba%2868%2C%2071%2C%2090%2C%201%29%20%21important%3B%0A%7D%0Ainput%2C%0Aselect%2C%0Abutton%2C%0A%5Brole%3D%22button%22%5D%2C%0Aa%2Ebutton%2C%0Aa%2Esubmit%2C%0Aa%2EBigButton%2C%0Aa%2ETabLink%2C%0A%2Einstall%5Bonclick%5D%20%7B%0Atext%2Dindent%3A%205px%3B%0Aappearance%3A%20none%20%21important%3B%0A%2Dmoz%2Dappearance%3A%20none%20%21important%3B%0A%2Dwebkit%2Dappearance%3A%20none%20%21important%3B%0Abackground%3A%20rgba%2868%2C%2071%2C%2090%2C%201%29%20%21important%3B%0A%7D%0Atextarea%20%7B%0Aappearance%3A%20none%20%21important%3B%0A%2Dmoz%2Dappearance%3A%20none%20%21important%3B%0A%2Dwebkit%2Dappearance%3A%20none%20%21important%3B%0Abackground%3A%20rgba%2868%2C%2071%2C%2090%2C%201%29%20%21important%3B%0A%7D%0Adiv%2C%0Aul%2C%0Ali%20%7B%0Abackground%2Dimage%3A%20none%20%21important%3B%0A%7D%0Aa%2Ehighlight%2C%0Aa%2Ehighlight%20%2A%2C%0Aa%2Eactive%2C%0Aa%2Eactive%20%2A%2C%0A%2Eselected%2C%0A%2Eselected%20%2A%2C%0A%5Bhref%3D%22%23%22%5D%20%7B%0Afont%2Dweight%3A%20bold%20%21important%3B%0Acolor%3A%20rgba%28139%2C%20233%2C%20253%2C%201%29%20%21important%3B%0A%7D%0Abody%20%7B%0Awidth%3A%2050%25%3B%0Amargin%2Dinline%3A%20auto%3B%0A%7D%0A%2EsourceCode%20%7B%0Aborder%2Dradius%3A%2010px%3B%0Apadding%3A%203px%3B%0A%7D%0A" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <nav class="nav">
+          <div class="logo">
+              <a href="/index.html" accesskey="h" title="wizardwatch (Alt + H)">wizardwatch</a>
+              <span class="logo-switches">
+              </span>
+          </div>
+          <ul id="menu">
+              <li>
+                  <a href="https://wizardwatch.net/tags/" title="Tags">
+                      <span>Tags</span>
+                  </a>
+              </li>
+          </ul>
+      </nav>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">lighttpd.conf</h1>
+</header>
+<pre><code>server.document-root = &quot;/home/wyatt/projects/xtodoc/docs/&quot;
+
+server.port = 3000
+
+mimetype.assign = (
+  &quot;.html&quot; =&gt; &quot;text/html&quot;,
+  &quot;.txt&quot; =&gt; &quot;text/plain&quot;,
+  &quot;.jpg&quot; =&gt; &quot;image/jpeg&quot;,
+  &quot;.png&quot; =&gt; &quot;image/png&quot;
+)</code></pre>
+</body>
+</html>

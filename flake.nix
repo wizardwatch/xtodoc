@@ -22,6 +22,13 @@ flakes feature.
     pkgs = import nixpkgs {
       inherit system;
     };
+    gems = pkgs.bundlerEnv {
+      name = "xtodoc-packages";
+      inherit (pkgs) ruby;
+      gemdir = ./.;
+    };
+  in
+  let
     xtodoc = (with pkgs; stdenv.mkDerivation {
       pname = "xtodoc";
       version = "0.0.2";
@@ -30,6 +37,9 @@ flakes feature.
       During the installPhase I move the ruby file to the appropriate location for it to
       be run when the command xtodoc is run.
       */
+      BuildInputs = [
+        gems
+      ];
       installPhase = ''
         mkdir -p $out/bin
         mv ./xtodoc.rb $out/bin/xtodoc
