@@ -283,33 +283,25 @@ resource_paths_html = Dir[&quot;./docs/**/*&quot;].reject do |path|
   File.directory?(path) || image?(path)
 end
 index.close
-channel = Channel(Nil).new
-#channel2 = Channel(Nil).new
-num_needed = resource_paths_html.size
-threaded = false
-if threaded == true
-resource_paths_html.each do |file|
-  spawn do
-    system &quot;./addons/pandoc/pandoc.sh #{file} #{file[0..-4]}.html&quot;
-    #`./addons/pandoc/pandoc.sh #{file} #{file[0..-4]}`
-    File.delete file
-    #`rm #{file}`
-    channel.send(nil)
-  end
-end
-#spawn do
-  (1..num_needed).each { channel.receive }
-#  channel2.send(nil)
-#end
-#channel2.receive
-else
 
-resource_paths_html.each do |file|
+channel = Channel(Nil).new
+num_needed = resource_paths_html.size
+# TODO: Make this a config option
+threaded = true
+if threaded == true
+  resource_paths_html.each do |file|
+    spawn do
+      system &quot;./addons/pandoc/pandoc.sh #{file} #{file[0..-4]}.html&quot;
+      File.delete file
+      channel.send(nil)
+    end
+  end
+  (1..num_needed).each { channel.receive }
+else
+  resource_paths_html.each do |file|
     system &quot;./addons/pandoc/pandoc.sh #{file} #{file[0..-4]}.html&quot;
-    #`./addons/pandoc/pandoc.sh #{file} #{file[0..-4]}`
     File.delete file
-    #`rm #{file}`
-end
+  end
 end</code></pre>
 </body>
 </html>
