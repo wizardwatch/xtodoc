@@ -5,14 +5,6 @@ flakes feature.
 */
 {
   description = "Utility for generating markdown documentation from comments in code";
-  /*
-  While xtodoc doesn't depend on any packages except ruby, I follow my standard generic
-  installation method, and thus begin by taking the inputs necessary to pull dependencies
-  and build code for various platforms. I then take them as outputs. I use various
-  flake-utils functions to make this package definitions easier to write, beginning by
-  using one to target the current system architecture. Again, this is unnecessary for a
-  simple script but it is nice to keep it standard.
-  */
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
@@ -22,30 +14,20 @@ flakes feature.
     pkgs = import nixpkgs {
       inherit system;
     };
-    gems = pkgs.bundlerEnv {
-      name = "xtodoc-packages";
-      inherit (pkgs) ruby;
-      gemdir = ./.;
-    };
   in
   let
-    xtodoc = (with pkgs; stdenv.mkDerivation {
+    xtodoc = pkgs.crystal.buildCrystalPackage rec {
       pname = "xtodoc";
-      version = "0.0.2";
+      version = "0.0.3";
       src = ./.;
-      /*
-      During the installPhase I move the ruby file to the appropriate location for it to
-      be run when the command xtodoc is run.
-      */
-      BuildInputs = [
-        gems
-      ];
-      installPhase = ''
-        mkdir -p $out/bin
-        mv ./xtodoc.rb $out/bin/xtodoc
-        chmod +x $out/bin/xtodoc
-      '';
-    });
+      crystalBinaries.xtodoc = {
+        src = "./xtodoc.cr";
+        options = [];
+      };
+      format = "crystal";
+      doCheck = false;
+      doInstallCheck = false;
+    };
     /*
     In the following section I allow xtodoc to either be installed or tested in a nix
     shell environment.
@@ -58,6 +40,9 @@ flakes feature.
       devShell = pkgs.mkShell {
         buildInputs = [
           xtodoc
+          pkgs.hyperfine
+          pkgs.linuxPackages.perf
+          pkgs.valgrind
         ];
       };
   });

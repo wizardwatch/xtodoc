@@ -1,8 +1,6 @@
 require "file_utils"
 def makeindex(output, dir)
   files = Dir["#{dir}/**"]
-  puts "dir + #{dir}"
-  puts "files + #{files}"
   output.puts
   files.each do |file|
     if !File.directory?(file)
@@ -18,7 +16,6 @@ def image?(file)
   file.to_s.includes?(".gif") || file.to_s.includes?(".png") || file.to_s.includes?(".jpg")
 end
 
-
 def begin_file(file, output_file)
   output_file.puts("---")
   output_file.puts("title: #{File.basename(file)}")
@@ -30,10 +27,7 @@ def nix(file, output_file, file_extension)
   code = true
   input_file = File.open(file)
   file_lines = input_file.read_line
-  if file_lines.chomp == "/*"
-    puts "Found comment at beggining of file" + file
-  else
-    puts file + "Added extension at begin"
+  if file_lines.chomp != "/*"
     output_file.puts("```#{file_extension}")
   end
   input_file.each_line do |line|
@@ -86,6 +80,7 @@ end
 
 # config = TOML::Parser.new(File.open("./xtodoc.toml").read).parsed
 OUTPUT_DIR = "docs/"
+# FileUtils.rm_r(OUTPUT_DIR)
 `rm -rf #{OUTPUT_DIR}`
 resource_paths = Dir.glob("**/*").reject do |path|
   File.directory?(path) || path.ends_with?("index.md") || image?(path)
@@ -96,16 +91,19 @@ end
 directories = Dir.glob("**/*").select do |path|
   File.directory?(path) & (path != OUTPUT_DIR)
 end
-# FileUtils.mkpath OUTPUT_DIR
+#Dir.mkdir OUTPUT_DIR
 `mkdir #{OUTPUT_DIR}`
 directories.each do |dir|
-  # FileUtils.mkpath "#{OUTPUT_DIR}/#{dir}"
+  #Dir.mkdir "#{OUTPUT_DIR}/#{dir}"
   mkcommand = "mkdir #{OUTPUT_DIR}/#{dir}"
   `#{mkcommand}`
 end
 resource_paths.each do |file|
-  mdfile(file, OUTPUT_DIR)
+  #spawn do
+    mdfile(file, OUTPUT_DIR)
+  #end
 end
+#Fiber.yield
 directories.each do |dir|
   index = File.new("#{OUTPUT_DIR}/#{dir}/index.md", "w")
   begin_file(dir, index)
@@ -130,11 +128,24 @@ index.close
 resource_paths_html = Dir["./docs/**/*"].reject do |path|
   File.directory?(path) || image?(path)
 end
+index.close
 
-resource_paths_html.each do |file|
-  output_file_path = file[0..-4]
-  puts output_file_path
-  command = "pandoc -s #{file} -o #{output_file_path}.html --highlight-style=./theme/dracula/dracula.theme --css=./theme/wizardwatch.css --self-contained -H ./theme/header.html --lua-filter ./theme/root.lua"
-  `#{command}`
-  `rm #{file}`
+channel = Channel(Nil).new
+num_needed = resource_paths_html.size
+# TODO: Make this a config option
+threaded = true
+if threaded == true
+  resource_paths_html.each do |file|
+    spawn do
+      system "./addons/pandoc/pandoc.sh #{file} #{file[0..-4]}.html"
+      File.delete file
+      channel.send(nil)
+    end
+  end
+  (1..num_needed).each { channel.receive }
+else
+  resource_paths_html.each do |file|
+    system "./addons/pandoc/pandoc.sh #{file} #{file[0..-4]}.html"
+    File.delete file
+  end
 end

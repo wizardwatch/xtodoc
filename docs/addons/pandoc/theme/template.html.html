@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>docs</title>
+  <title>template.html</title>
   <style>
     html {
       line-height: 1.5;
@@ -150,15 +150,74 @@
 </head>
 <body>
 <header id="title-block-header">
-<h1 class="title">docs</h1>
+<h1 class="title">template.html</h1>
 </header>
-<p>Xtodoc is a programming focused static site generator that generates content not only from markdown files but also from code.</p>
-<p>./<a href="./addons/index.html">addons</a></p>
-<p>./<a href="./flake.lock.html">flake.lock</a></p>
-<p>./<a href="./flake.nix.html">flake.nix</a></p>
-<p>./<a href="./xtodoc.cr.html">xtodoc.cr</a></p>
-<p>./<a href="./index.html">index</a></p>
-<p>./<a href="./data.html">data</a></p>
-<p>./<a href="./result/index.html">result</a></p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; lang=&quot;$lang$&quot; xml:lang=&quot;$lang$&quot;$if(dir)$ dir=&quot;$dir$&quot;$endif$&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot; /&gt;
+  &lt;meta name=&quot;generator&quot; content=&quot;pandoc&quot; /&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, user-scalable=yes&quot; /&gt;
+$for(author-meta)$
+  &lt;meta name=&quot;author&quot; content=&quot;$author-meta$&quot; /&gt;
+$endfor$
+$if(date-meta)$
+  &lt;meta name=&quot;dcterms.date&quot; content=&quot;$date-meta$&quot; /&gt;
+$endif$
+$if(keywords)$
+  &lt;meta name=&quot;keywords&quot; content=&quot;$for(keywords)$$keywords$$sep$, $endfor$&quot; /&gt;
+$endif$
+$if(description-meta)$
+  &lt;meta name=&quot;description&quot; content=&quot;$description-meta$&quot; /&gt;
+$endif$
+  &lt;title&gt;$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$&lt;/title&gt;
+  &lt;style&gt;
+    $styles.html()$
+  &lt;/style&gt;
+$for(css)$
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;$css$&quot; /&gt;
+$endfor$
+$if(math)$
+  $math$
+$endif$
+  &lt;!--[if lt IE 9]&gt;
+    &lt;script src=&quot;//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js&quot;&gt;&lt;/script&gt;
+  &lt;![endif]--&gt;
+$for(header-includes)$
+  $header-includes$
+$endfor$
+&lt;/head&gt;
+&lt;body&gt;
+$for(include-before)$
+$include-before$
+$endfor$
+$if(title)$
+&lt;header id=&quot;title-block-header&quot;&gt;
+&lt;h1 class=&quot;title&quot;&gt;$title$&lt;/h1&gt;
+$if(subtitle)$
+&lt;p class=&quot;subtitle&quot;&gt;$subtitle$&lt;/p&gt;
+$endif$
+$for(author)$
+&lt;p class=&quot;author&quot;&gt;$author$&lt;/p&gt;
+$endfor$
+$if(date)$
+&lt;p class=&quot;date&quot;&gt;$date$&lt;/p&gt;
+$endif$
+&lt;/header&gt;
+$endif$
+$if(toc)$
+&lt;nav id=&quot;$idprefix$TOC&quot; role=&quot;doc-toc&quot;&gt;
+$if(toc-title)$
+&lt;h2 id=&quot;$idprefix$toc-title&quot;&gt;$toc-title$&lt;/h2&gt;
+$endif$
+$table-of-contents$
+&lt;/nav&gt;
+$endif$
+$body$
+$for(include-after)$
+$include-after$
+$endfor$
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
 </body>
 </html>
