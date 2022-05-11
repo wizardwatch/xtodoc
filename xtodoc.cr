@@ -74,16 +74,15 @@ def mdfile(file, output_dir)
   when "md"
     md(file, File.new("#{output_dir}/#{file}", "w"))
   else
+    puts "file #{output_dir + file}"
     other(file, File.new("#{output_dir}/#{file}.md", "w"))
   end
 end
 
-# config = TOML::Parser.new(File.open("./xtodoc.toml").read).parsed
 OUTPUT_DIR = "docs/"
-# FileUtils.rm_r(OUTPUT_DIR)
 `rm -rf #{OUTPUT_DIR}`
 resource_paths = Dir.glob("**/*").reject do |path|
-  File.directory?(path) || path.ends_with?("index.md") || image?(path)
+  File.directory?(path) || path.ends_with?("index.md") || image?(path) || File.symlink?(path)
 end
 images = Dir.glob("**/*").select do |path|
   image?(path)
@@ -91,19 +90,13 @@ end
 directories = Dir.glob("**/*").select do |path|
   File.directory?(path) & (path != OUTPUT_DIR)
 end
-#Dir.mkdir OUTPUT_DIR
 `mkdir #{OUTPUT_DIR}`
 directories.each do |dir|
-  #Dir.mkdir "#{OUTPUT_DIR}/#{dir}"
-  mkcommand = "mkdir #{OUTPUT_DIR}/#{dir}"
-  `#{mkcommand}`
+  `mkdir #{OUTPUT_DIR}/#{dir}`
 end
 resource_paths.each do |file|
-  #spawn do
-    mdfile(file, OUTPUT_DIR)
-  #end
+  mdfile(file, OUTPUT_DIR)
 end
-#Fiber.yield
 directories.each do |dir|
   index = File.new("#{OUTPUT_DIR}/#{dir}/index.md", "w")
   begin_file(dir, index)
@@ -125,27 +118,35 @@ images.each do |image|
   FileUtils.cp(image, "./docs/#{image}")
 end
 index.close
-resource_paths_html = Dir["./docs/**/*"].reject do |path|
+resource_paths_html = Dir[Dir.current + "/docs/**/*"].reject do |path|
   File.directory?(path) || image?(path)
 end
 index.close
 
 channel = Channel(Nil).new
 num_needed = resource_paths_html.size
-# TODO: Make this a config option
-threaded = true
-if threaded == true
-  resource_paths_html.each do |file|
-    spawn do
-      system "./addons/pandoc/pandoc.sh #{file} #{file[0..-4]}.html"
-      File.delete file
-      channel.send(nil)
-    end
-  end
-  (1..num_needed).each { channel.receive }
-else
-  resource_paths_html.each do |file|
-    system "./addons/pandoc/pandoc.sh #{file} #{file[0..-4]}.html"
-    File.delete file
+resource_paths_html.each do |file|
+  spawn do
+    output = IO::Memory.new
+    error  = IO::Memory.new
+    proc = Process.new(
+      command: "pandoc",
+      args: [
+        "--to=html",
+        "--highlight-style=./theme/dracula/dracula.theme",
+        "--css=./theme/wizardwatch.css",
+        "--self-contained",
+        "--include-in-header=./theme/header.html"
+      ],
+      input: IO::Memory.new(File.read(file)),
+      output: output,
+      error: error
+    )
+    proc.wait
+    `touch #{file[0..-4] + ".html"}`
+    File.write(file[0..-4] + ".html", output.to_s)
+    puts error
+    channel.send(nil)
   end
 end
+(1..num_needed).each { channel.receive }
